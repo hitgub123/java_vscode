@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <form>
+        <input v-model="user.id" type="hidden" /><br />
+        用户名<input v-model="user.name" />
+        <span class="error" v-if="errors.nameErr">{{errors.nameErr}}</span
+        ><br />
+        密码<input v-model="user.pass" />
+        <span class="error" v-if="errors.passErr">{{errors.passErr}}</span
+        ><br />
+        年龄<input v-model="user.age" />
+        <span class="error" v-if="errors.ageErr">{{errors.ageErr}}</span><br />
+        文件1<input type="file" name="file11" ref="file1" /><br />
+        文件2<input type="file" name="file22" ref="file2" /><br />
+      </form>
+      <button type="buttuon" @click="submit">submit</button> <br />
+    </div>
+  </body>
+</html>
+
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script>
+  const app = new Vue({
+    el: "#app",
+    data() {
+      return {
+        user: {
+          name: "",
+          pass: "",
+          age: "",
+        },
+        errors: {
+          nameErr: "",
+          passErr: "",
+          ageErr: "",
+        },
+      };
+    },
+    methods: {
+      submit() {
+        this.errors = {
+          nameErr: "",
+          passErr: "",
+          ageErr: "",
+        }
+        this_ = this
+        // 判断是update还是insert
+        if (this.user.id == undefined || this.user.id == "0") {
+          //console.log('insert')
+          let params = new FormData();
+          //console.log('this.$refs',this.$refs.file1)
+          let fileSelectDom1 = this.$refs.file1;
+          let fileSelectDom2 = this.$refs.file2;
+
+          const config = {
+            headers: { "Content-Type": "multipart/form-data" },
+            //headers: { "Content-Type": "multipart/form-data","name":this.user.name }
+          };
+          if (fileSelectDom1.files[0] != undefined) {
+            params.append("userfile", fileSelectDom1.files[0]);
+          }
+          if (fileSelectDom2.files[0] != undefined) {
+            params.append("userfile", fileSelectDom2.files[0]);
+          }
+
+          params.append("name", this.user.name);
+          params.append("age", this.user.age);    
+          params.append("pass", this.user.pass);
+          console.log("params", params, params.getAll("userfile"));
+
+          // 如果上传文件要用.post(url, params,config)
+          axios.post("/u/insert", params, config).then(function (res) {
+            console.log("res.data.data", res.data["data"]);
+            if (res.data.code == 0) {
+              //location.href = "/u/users"
+            } else if (res.data.code == 2) {
+              this_.writeErrors(res.data.data, this_.errors);
+              /*errors = res.data.data;
+              for (let key in errors) {
+                //console.log(errors[key]['field'] + "======" + errors[key]['defaultMessage']);
+                let k = errors[key]["field"] + "Err";
+                let err = this_.errors[k];
+                console.log("xxx", this_.errors[k]);
+                if (err == undefined || err == "") {
+                  this_.errors[k] = errors[key]["defaultMessage"];
+                } else {
+                  this_.errors[k] =
+                    this_.errors[k] + "," + errors[key]["defaultMessage"];
+                }
+              }*/
+            }
+          });
+        } else {
+          //console.log('update')
+          const data = {
+            id: this.user.id,
+            name: this.user.name,
+            age: this.user.age,
+            pass: this.user.pass,
+          };
+          // 如果不上传文件，用.post(url, data)即可
+          axios.post("/u/update", data).then(function (res) {
+            console.log("res.data.data", res.data["code"]);
+            if (res.data.code == 0) {
+              location.href = "/users.html";
+            } else if (res.data.code == 2) {
+              this_.writeErrors(res.data.data, this_.errors);
+            }
+          });
+        }
+      },
+      writeErrors(errors, dest) {
+        //errors = res.data.data
+        for (let key in errors) {
+          //console.log(errors[key]['field'] + "======" + errors[key]['defaultMessage']);
+          let k = errors[key]["field"] + "Err";
+          let err = dest[k];
+          console.log("xxx", dest[k]);
+          if (err == undefined || err == "") {
+            dest[k] = errors[key]["defaultMessage"];
+          } else {
+            dest[k] = dest[k] + "," + errors[key]["defaultMessage"];
+          }
+        }
+      },
+      getQy(key) {
+        let geturl = window.location.href;
+        let getquerys = geturl.split("?")[1]; //qycode=1001&qyname=%E4%BC%81%E4%B8%9A%E5%BF%99   截取到参数部分
+        let getqy = new URLSearchParams("?" + getquerys); //将参数放在URLSearchParams函数中
+        return getqy.get(key);
+      },
+      oneByid() {
+        let id = this.getQy("id");
+        console.info("oneByid", id);
+        if (id != "0" && id != undefined) {
+          _this = this;
+          axios.get("/u/oneByid?id=" + id).then(function (res) {
+            console.log(res.data.data);
+            _this.user = res.data.data;
+          });
+        }
+      },
+    },
+    created() {
+      this.oneByid();
+    },
+  });
+</script>
+<style>
+  .error {
+    color: red;
+  }
+</style>

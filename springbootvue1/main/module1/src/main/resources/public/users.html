@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <table>
+        <tbody>
+          <tr>
+            <th>编号</th>
+            <th>ID</th>
+            <th>年龄</th>
+            <th>用户名</th>
+            <th>密码</th>
+            <th>上次修改时间</th>
+            <th>图片1</th>
+            <th>图片2</th>
+            <th>操作<button @click="toUpdate(0)">新增</button></th>
+          </tr>
+          <tr v-for="(value,  index) in users.records">
+            <td>{{index+1}}</td>
+            <td>{{value.id}}</td>
+            <td>{{value.age}}</td>
+            <td>{{value.name}}</td>
+            <td>{{value.pass}}</td>
+            <td>{{value.lasttime}}</td>
+            <td>
+              <img
+                style="height: 100px"
+                :src='"/upload/"+value.pic1'
+                :alt="value.pic1"
+              />
+            </td>
+            <td>
+              <img
+                style="height: 100px"
+                :src='"/upload/"+value.pic2'
+                :alt="value.pic2"
+              />
+            </td>
+            <td>
+              <button @click="toUpdate(value.id)">修改</button>
+              <button @click="doDelete(value.id)">删除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script>
+  const app = new Vue({
+    el: "#app",
+    data() {
+      return {
+        users: [],
+      };
+    },
+    methods: {
+      getQy(key) {
+        let geturl = window.location.href;
+        let getquerys = geturl.split("?")[1]; //qycode=1001&qyname=%E4%BC%81%E4%B8%9A%E5%BF%99   截取到参数部分
+        let getqy = new URLSearchParams("?" + getquerys); //将参数放在URLSearchParams函数中
+        let v = getqy.get(key);
+        if (v == undefined || v == null) {
+          v = "";
+        }
+        return v;
+      },
+      page() {
+        _this = this;
+        page = this.getQy("page");
+        keyword = this.getQy("keyword");
+        //console.log(page,keyword)
+        axios
+          .get("/u/page?page=" + page + "&keyword=" + keyword)
+          .then(function (res) {
+            console.log(res.data.data);
+            _this.users = res.data.data;
+          });
+      },
+      toUpdate(id) {
+        location.href = "/user.html?id=" + id;
+      },
+      doDelete: function (id) {
+        _this = this;
+        axios.get("/u/delete?id=" + id).then(function (res) {
+          _this.page();
+        });
+      },
+    },
+    created() {
+      this.page();
+    },
+  });
+</script>
+
+<style>
+  table {
+    border-collapse: collapse; /* 隣接するセルの罫線を重ねて表示する */
+    font-family: "メイリオ", sans-serif; /* フォントのスタイルを指定する */
+    color: #000000; /* フォントの色を指定する */
+    width: 80%; /* テーブルの横幅を指定する */
+  }
+  td,
+  th {
+    border: 1px solid #000000; /* 境界線を実線で指定する */
+    background-color: rgba(0, 0, 0, 0.3); /* 背景色を指定する */
+    text-align: center; /* インライン要素の位置を指定する */
+    padding: 3px; /* 要素の余白を指定する(上下左右) */
+  }
+  th {
+    background-color: #31a9ee; /* 見出しの背景色を指定する */
+  }
+</style>
