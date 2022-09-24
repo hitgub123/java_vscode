@@ -1,6 +1,5 @@
 
 
-<p align="center">
     简介：
         使用技术：vscode,sprinboot,mybatisplus,springmvc,postgresql,vue,jwt,axios
         springboot多模块，前后端分离，多文件上传，后端数据校验
@@ -194,4 +193,3 @@
             自己有些页面时js的location.href跳转，不知道怎么设置请求头，所以把token放在cookie里。
 
     vuecli+elementui 
-</p>
