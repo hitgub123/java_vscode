@@ -1,23 +1,4 @@
-<p align="center">
-  <a href="" rel="noopener">
- <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
-</p>
-
-<h3 align="center">Project Title</h3>
-
-<div align="center">
-
-[![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/kylelobo/The-Documentation-Compendium/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/kylelobo/The-Documentation-Compendium/pulls)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
-
-</div>
-
----
-
-<p align="center"> Few lines describing your project.
- 简介：
+简介：
     使用技术：vscode,sprinboot,mybatisplus,springmvc,postgresql,vue,jwt,axios
     springboot多模块，前后端分离，多文件上传，后端数据校验
 
@@ -209,5 +190,4 @@ springmvc:
         访问其他页面时读取localstorage再手动加到请求头，后台的拦截器从请求头读取token进行校验。
         自己有些页面时js的location.href跳转，不知道怎么设置请求头，所以把token放在cookie里。
 
-vuecli+elementui 
-</p>
+vuecli+elementui
