@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      @import "/css/slq.css";
+    </style>
     <title>Document</title>
   </head>
   <body>
@@ -19,7 +22,10 @@
             <th>上次修改时间</th>
             <th>图片1</th>
             <th>图片2</th>
-            <th>操作<button @click="toUpdate(0)">新增</button></th>
+            <th>
+              操作<button @click="toUpdate(0)">新增</button
+              ><button type="button" @click="logout">logout</button>
+            </th>
           </tr>
           <tr v-for="(value,  index) in users.records">
             <td>{{index+1}}</td>
@@ -94,28 +100,15 @@
           _this.page();
         });
       },
+      logout() {
+        axios.get("/u/logout").then(function (res) {
+          console.log(res.data.data)
+          location.href = "/login.html"
+        });
+      },
     },
     created() {
       this.page();
     },
   });
 </script>
-
-<style>
-  table {
-    border-collapse: collapse; /* 隣接するセルの罫線を重ねて表示する */
-    font-family: "メイリオ", sans-serif; /* フォントのスタイルを指定する */
-    color: #000000; /* フォントの色を指定する */
-    width: 80%; /* テーブルの横幅を指定する */
-  }
-  td,
-  th {
-    border: 1px solid #000000; /* 境界線を実線で指定する */
-    background-color: rgba(0, 0, 0, 0.3); /* 背景色を指定する */
-    text-align: center; /* インライン要素の位置を指定する */
-    padding: 3px; /* 要素の余白を指定する(上下左右) */
-  }
-  th {
-    background-color: #31a9ee; /* 見出しの背景色を指定する */
-  }
-</style>

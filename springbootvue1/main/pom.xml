@@ -16,7 +16,7 @@
 	<!-- add packaging end -->
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>8</java.version>
 	</properties>
 	<!-- add modules and module start -->
 	<modules>
@@ -84,9 +84,11 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 			<version>2.7.0</version>
 		</dependency>
-
-
-
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.4.1</version>
+		</dependency>
 
 	</dependencies>
 

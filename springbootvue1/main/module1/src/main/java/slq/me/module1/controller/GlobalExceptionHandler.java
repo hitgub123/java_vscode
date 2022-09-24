@@ -23,7 +23,8 @@ public class GlobalExceptionHandler {
             IOException.class, IndexOutOfBoundsException.class, HttpRequestMethodNotSupportedException.class })
     public Result otherExceptionHandler(Exception e) {
         log.error(e.getMessage());
-        return new Result(1,e.getMessage(),null);
+        // return new Result(1, e.getMessage(), null);
+        return new Result(1, "otherException", e);
     }
 
     @ExceptionHandler(BindException.class)
@@ -39,15 +40,18 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
-        return new Result(1, e.getMessage(), null);
+        for (ObjectError error : e.getAllErrors()) {
+            log.error(error.getObjectName() + ">>>" + error.getDefaultMessage());
+        }
+        return new Result(2, "MethodArgumentNotValidException", e.getAllErrors());
     }
 
     @ResponseBody
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Result ConstraintViolationExceptionHandler(ConstraintViolationException e) {
         log.error(e.getMessage());
-        return new Result(1, e.getMessage(), null);
+        // return new Result(1, e.getMessage(), null);
+        return new Result(1, "ConstraintViolationException", e);
     }
 
 }

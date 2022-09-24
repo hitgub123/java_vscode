@@ -155,7 +155,34 @@ springmvc:
                 result.hasErrors()判断是否也error，result.getAllErrors()获取所有error
                 b-2，也返回json对象，后续前端的处理后全局异常处理一模一样
             不管用哪个异常处理，接收异常后必须return，否则之后的controller代码会继续执行
+    
+    数据分组校验（往db插入或更新user时需要在form输入很多字段，login时form只填写user和pass，校验规则不同，所以需要进行分组校验）：
+        1，创建groups的空接口，如public class ValidationGroups {public interface Required {}}
+        2，在有校验差异需求的规则里加上groups，如 @Email(message = "需要邮箱格式", groups = {ValidationGroups.Required.class })
+        3，在controller里@Validated注解里加groups,
+            如public Result update(@Validated(ValidationGroups.Required.class) @RequestBody User o) ,此时@Email对此User生效。
+        4，一个组的校验规则，对其他组不生效
+        5，如果某个校验规则没有groups属性，那么它对controller里@Validated含有groups属性的表单都不生效
+        6，如果某个controller里@Validated不含groups，那么@Validated含有groups属性的校验规则对它都不生效
 
-        
+    拦截器：
+        1，配置springboot扫描拦截器，参考slq\me\module1\config\WebConfig.java
+            注意：要写addPathPatterns("/**")，不要写addPathPatterns("/*")，否则/u/delete这样的url不会被拦截
+        2，配置拦截器，参考slq\me\module1\interceptor\LoginInterceptor.java
+    拦截器实现使用session登录：
+        1，在LoginInterceptor.java的preHandle里使用preHandleInnerWithSession方法，
+        检查被拦截的请求的session里是否有user，如果没有就跳转login
+        2，login登录成功后，往session里设置user
+        3，访问任意页面session里都会携带user
+    拦截器实现使用jwt登录：
+        1，pom引用com.auth0.java-jwt
+        2，使用jwt生成/校验token，检查是否快过期，参考slq\me\module1\util\JWTUtils.java
+        3，在LoginInterceptor.java的preHandle里使用preHandleInnerWithJWT方法，
+        检查被拦截的请求的cookie里是否有token，是否过期，能否通过检验，如果不能就跳转login
+        4，login登录成功后，往cookie里设置token，注意设置cookie路径为根路径（"/"）
+        5，访问任意页面cookie里都会自动携带token
+        网上参考别人的方法是把token放在响应头里返回前端，之后保存在localstorage里，
+        访问其他页面时读取localstorage再手动加到请求头，后台的拦截器从请求头读取token进行校验。
+        自己有些页面时js的location.href跳转，不知道怎么设置请求头，所以把token放在cookie里。
 
-jwt，登录，，vuecli+elementui
+vuecli+elementui

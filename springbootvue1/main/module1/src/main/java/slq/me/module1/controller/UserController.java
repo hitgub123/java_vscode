@@ -2,21 +2,23 @@ package slq.me.module1.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.system.ApplicationHome;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.http.HttpCookie;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -34,12 +36,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import lombok.extern.slf4j.Slf4j;
+import slq.me.module1.entity.ErrorType2;
 import slq.me.module1.entity.Result;
 import slq.me.module1.entity.User;
+import slq.me.module1.entity.ValidationGroups;
 import slq.me.module1.service.UserService;
 import slq.me.module1.util.FileAndPathUtil;
 import slq.me.module1.util.ImageVerify;
-import org.apache.commons.io.FilenameUtils;
+import slq.me.module1.util.JWTUtils;
 
 @RestController
 @RequestMapping("u")
@@ -58,6 +62,9 @@ public class UserController {
 
     @Value("${file.uploadPath}")
     String uploadPath;
+
+    @Value("${capture.name}")
+    String captureName;
 
     @GetMapping("page")
     // 如果设置int page，即使加上@RequestParam(required = false) int page设置可以为空，
@@ -82,11 +89,18 @@ public class UserController {
         try {
             ImageIO.write(imageCode.getImage(), "jpg", response.getOutputStream());
             response.setContentType("image/jpeg");
-            session.setAttribute("capture", imageCode.getCode());
+            session.setAttribute(captureName, imageCode.getCode());
             response.getOutputStream().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+            throws IOException {
+        session.setAttribute("user", null);
+        response.sendRedirect(request.getContextPath() + "/login.html");
     }
 
     @GetMapping("oneByid")
@@ -113,7 +127,8 @@ public class UserController {
 
     @PostMapping("insert")
     // @RequestPart里的value需要和FormData的文件数组的key对应
-    public Result insert(@Nullable @RequestPart("userfile") MultipartFile[] uploadFiles, @Validated User o) {
+    public Result insert(@Nullable @RequestPart("userfile") MultipartFile[] uploadFiles,
+            @Validated(ValidationGroups.InsertGroup.class) User o) {
 
         // log.error("sss"+result.getAllErrors().size());
         // if (result != null && result.hasErrors()) {
@@ -139,6 +154,7 @@ public class UserController {
                     if (index == 1) {
                         o.setPic1(filename);
                     }
+                    //如果只上传第二张图，路径会报错到pic1，不改了
                     if (index == 2) {
                         o.setPic2(filename);
                     }
@@ -150,8 +166,7 @@ public class UserController {
             }
         }
 
-        // int id = userService.insertReturnId(o);
-        int id = 1;
+        int id = userService.insertReturnId(o);
         if (id != -1) {
             return new Result(0, null, "创建成功,id=" + id);
         } else {
@@ -160,18 +175,14 @@ public class UserController {
     }
 
     @PostMapping("update")
-    public Result update(@Validated @RequestBody User o, BindingResult result) {
-        User a = new User();
-        if (true)
-            a = null;
-        int c = a.getAge();
+    public Result update(@Validated(ValidationGroups.InsertGroup.class) @RequestBody User o, BindingResult result) {
         if (result.hasErrors()) {
             for (ObjectError e : result.getAllErrors()) {
                 System.out.println(e);
             }
             return new Result(2, "BindException", result.getAllErrors());
         }
-        
+
         log.info("update user" + o);
         int count = userService.update(o);
         if (count > 0) {
@@ -179,5 +190,45 @@ public class UserController {
         } else {
             return new Result(1, "更新失败,id=" + o.getId(), null);
         }
+    }
+
+    @PostMapping("login")
+    public Result login(@Validated(ValidationGroups.LoginGroup.class) @RequestBody User o,
+            HttpSession session, HttpServletResponse response) {
+        String capture = (String) session.getAttribute(captureName);
+        if (!StringUtils.equals(capture, o.getCapture())) {
+            List<ErrorType2> errs = new ArrayList<ErrorType2>();
+            errs.add(new ErrorType2("capture", "验证码错误"));
+            return new Result(2, "登录失败", errs);
+        }
+        log.warn("login user" + o);
+        QueryWrapper<User> wrapper = new QueryWrapper<User>();
+        wrapper.eq("name", o.getName()).eq("password", o.getPass());
+        User u = userService.one(wrapper);
+        if (u != null) {
+            // 保存登录信息到session，二选一即可
+            // saveLoginStateWithSession(session, u);
+            // return new Result(0, null, "登录成功,id=" + u.getId());
+
+            // 保存登录信息到jwt，二选一即可
+            String newToken = JWTUtils.createToken(u.getId()+"");
+            // response.setHeader(JWTUtils.USER_LOGIN_TOKEN, newToken);
+            JWTUtils.saveToken2Cookie(response, newToken);
+            // return new Result(0, null, tokenMap);
+            return new Result(0, null, "登录成功");
+        } else {
+            return new Result(1, "登录失败", null);
+        }
+    }
+
+    // @PostMapping("loginJWT")
+    // public void loginJWT(User o, HttpServletResponse response) {
+    //     log.warn("login user" + o);
+    //     o.setName("a").setId(1);
+    //     saveLoginStateWithJWT(response, o);
+    // }
+
+    private void saveLoginStateWithSession(HttpSession session, User u) {
+        session.setAttribute("user", u.getId());
     }
 }
