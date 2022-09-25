@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class Result {
     int code ;
+    String msg;
     String errorMsg;
     Object data;
 

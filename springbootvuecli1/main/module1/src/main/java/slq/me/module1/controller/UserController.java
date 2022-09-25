@@ -2,14 +2,11 @@ package slq.me.module1.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,7 +15,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpCookie;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -66,6 +62,11 @@ public class UserController {
     @Value("${capture.name}")
     String captureName;
 
+    @Value("${timestamp.mod}")
+    long timestampMod;
+    @Value("${timestamp.offset}")
+    long timestampOffset;
+
     @GetMapping("page")
     // 如果设置int page，即使加上@RequestParam(required = false) int page设置可以为空，
     // 如果url是page=&keyword=，会报错""无法转成int
@@ -80,21 +81,7 @@ public class UserController {
         }
         wrapper.orderByDesc("id");
         IPage<User> iPage = userService.page(page1, pagesize, wrapper);
-        return new Result(0, null, iPage);
-    }
-
-    @GetMapping("capture")
-    public void getCapture(HttpServletResponse response, HttpSession session) {
-        ImageVerify.ImageCode imageCode = iv.create();
-        try {
-            ImageIO.write(imageCode.getImage(), "jpg", response.getOutputStream());
-            response.setContentType("image/jpeg");
-            session.setAttribute(captureName, imageCode.getCode());
-            log.error("getcapture is " + imageCode.getCode());
-            response.getOutputStream().flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return new Result(0, null, null, iPage);
     }
 
     @GetMapping("logout")
@@ -107,22 +94,22 @@ public class UserController {
     @GetMapping("oneByid")
     public Result one(Integer id) {
         if (id == null) {
-            return new Result(1, "id is null", null);
+            return new Result(1, null, "id is null", null);
         }
         User user = userService.one(id);
-        return new Result(0, null, user);
+        return new Result(0, null, null, user);
     }
 
     @GetMapping("delete")
     public Result delete(Integer id) {
         if (id == null) {
-            return new Result(1, "id is null", null);
+            return new Result(1, null, "id is null", null);
         }
         int countr = userService.delete(id);
         if (countr > 0) {
-            return new Result(0, null, "删除成功,id=" + id);
+            return new Result(0, "删除成功,id=" + id, null, null);
         } else {
-            return new Result(1, "删除失败,id=" + id, null);
+            return new Result(1, null, "删除失败,id=" + id, null);
         }
     }
 
@@ -155,23 +142,23 @@ public class UserController {
                     if (index == 1) {
                         o.setPic1(filename);
                     }
-                    //如果只上传第二张图，路径会报错到pic1，不改了
+                    // 如果只上传第二张图，路径会报错到pic1，不改了
                     if (index == 2) {
                         o.setPic2(filename);
                     }
                     index++;
                 } catch (IllegalStateException | IOException e) {
                     e.printStackTrace();
-                    return new Result(1, "文件上传失败", null);
+                    return new Result(1, null, "文件上传失败", null);
                 }
             }
         }
 
         int id = userService.insertReturnId(o);
         if (id != -1) {
-            return new Result(0, null, "创建成功,id=" + id);
+            return new Result(0, "创建成功,id=" + id, null, null);
         } else {
-            return new Result(1, "创建失败", null);
+            return new Result(1, null, "创建失败", null);
         }
     }
 
@@ -181,27 +168,42 @@ public class UserController {
             for (ObjectError e : result.getAllErrors()) {
                 System.out.println(e);
             }
-            return new Result(2, "BindException", result.getAllErrors());
+            return new Result(2, null, "BindException", result.getAllErrors());
         }
 
         log.info("update user" + o);
         int count = userService.update(o);
         if (count > 0) {
-            return new Result(0, null, "更新成功,id=" + o.getId());
+            return new Result(0, "更新成功,id=" + o.getId(), null, null);
         } else {
-            return new Result(1, "更新失败,id=" + o.getId(), null);
+            return new Result(1, null, "更新失败,id=" + o.getId(), null);
+        }
+    }
+
+    @GetMapping("capture")
+    public void getCapture(Long time, HttpServletResponse response, HttpSession session) {
+        long capture = time % timestampMod + timestampOffset;
+        ImageVerify.ImageCode imageCode = iv.create("" + capture);
+        try {
+            ImageIO.write(imageCode.getImage(), "jpg", response.getOutputStream());
+            response.setContentType("image/jpeg");
+            // log.error("generated capture is " + time+"-"+
+            // capture+"-"+imageCode.getCode());
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @PostMapping("login")
     public Result login(@Validated(ValidationGroups.LoginGroup.class) @RequestBody User o,
             HttpSession session, HttpServletResponse response) {
-        String capture = (String) session.getAttribute(captureName);
-        log.error("login session capture is "+capture);
-        if (!StringUtils.equals(capture, o.getCapture())) {
+        long capture = o.getCaptureTime() % timestampMod + timestampOffset;
+        // log.error("login session capture is "+capture);
+        if (!StringUtils.equals("" + capture, o.getCapture())) {
             List<ErrorType2> errs = new ArrayList<ErrorType2>();
             errs.add(new ErrorType2("capture", "验证码错误"));
-            return new Result(2, "登录失败", errs);
+            return new Result(2, null, "登录失败", errs);
         }
         log.warn("login user" + o);
         QueryWrapper<User> wrapper = new QueryWrapper<User>();
@@ -213,22 +215,17 @@ public class UserController {
             // return new Result(0, null, "登录成功,id=" + u.getId());
 
             // 保存登录信息到jwt，二选一即可
-            String newToken = JWTUtils.createToken(u.getId()+"");
+            String newToken = JWTUtils.createToken(u.getId() + "");
             // response.setHeader(JWTUtils.USER_LOGIN_TOKEN, newToken);
-            JWTUtils.saveToken2Cookie(response, newToken);
-            // return new Result(0, null, tokenMap);
-            return new Result(0, null, "登录成功");
+            // 前后端分离，设置cookie也访问不到
+            // JWTUtils.saveToken2Cookie(response, newToken);
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(JWTUtils.USER_LOGIN_TOKEN, newToken);
+            return new Result(0, "登录成功", null, map);
         } else {
-            return new Result(1, "登录失败", null);
+            return new Result(1, null, "登录失败", null);
         }
     }
-
-    // @PostMapping("loginJWT")
-    // public void loginJWT(User o, HttpServletResponse response) {
-    //     log.warn("login user" + o);
-    //     o.setName("a").setId(1);
-    //     saveLoginStateWithJWT(response, o);
-    // }
 
     private void saveLoginStateWithSession(HttpSession session, User u) {
         session.setAttribute("user", u.getId());

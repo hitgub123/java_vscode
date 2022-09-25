@@ -1,15 +1,16 @@
 package slq.me.module1.util;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 
 /**
  * 网上找的
@@ -72,7 +73,7 @@ public class JWTUtils {
      * 
      * @param token
      */
-    public static String validateToken(String token) throws TokenExpiredException{
+    public static String validateToken(String token) throws TokenExpiredException {
         return JWT.require(Algorithm.HMAC512(secret))
                 .build()
                 .verify(token)
@@ -96,10 +97,10 @@ public class JWTUtils {
         } catch (TokenExpiredException e) {
             return true;
         }
-        // 如果剩余过期时间少于过期时常的一般时 需要更新                 // expireTime/4
+        // 如果剩余过期时间少于过期时常的一般时 需要更新 // expireTime/4
         return (expiresAt.getTime() - System.currentTimeMillis()) < (expireTime >> 1);
     }
-    
+
     // 保存到cookie
     public static void saveToken2Cookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(JWTUtils.USER_LOGIN_TOKEN, token);

@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class Result {
-    int code ;
+    int code;
     String errorMsg;
     Object data;
 

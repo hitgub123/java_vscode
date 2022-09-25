@@ -1,12 +1,15 @@
 package slq.me.module1.util;
 
-import lombok.Data;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 import java.util.Random;
 
 import org.springframework.stereotype.Service;
+
+import lombok.Data;
 
 @Data
 @Service
@@ -104,4 +107,36 @@ public class ImageVerify {
         return new Color(r, g, b);
     }
 
+    public ImageCode create(String sRand) {
+        final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        final Graphics graphics = image.getGraphics();
+        graphics.setColor(getRandColor(200, 500));
+        graphics.fillRect(0, 0, width, height);
+        graphics.setFont(new Font("Times New Roman", Font.ITALIC, fontSize));
+        graphics.setColor(getRandColor(100, 200));
+
+        final Random random = new Random();
+
+        /** 画干扰线 */
+        for (int i = 0; i < lineSize; i++) {
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
+            int xl = random.nextInt(12);
+            int yl = random.nextInt(12);
+            graphics.drawLine(x, y, x + xl, y + yl);
+        }
+
+        /** 画验证码 */
+        for (int i = 0; i < sRand.length(); i++) {
+            graphics.setColor(
+                    new Color(
+                            20 + random.nextInt(110),
+                            20 + random.nextInt(110),
+                            20 + random.nextInt(110)));
+            graphics.drawString(sRand.substring(i,i+1), letterSpace * i + positionX, positionY);
+        }
+        graphics.dispose();
+
+        return new ImageCode(image, sRand, expireIn);
+    }
 }

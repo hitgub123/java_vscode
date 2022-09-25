@@ -2,14 +2,10 @@ package slq.me.module1.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,7 +14,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpCookie;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -155,7 +150,7 @@ public class UserController {
                     if (index == 1) {
                         o.setPic1(filename);
                     }
-                    //如果只上传第二张图，路径会报错到pic1，不改了
+                    // 如果只上传第二张图，路径会报错到pic1，不改了
                     if (index == 2) {
                         o.setPic2(filename);
                     }
@@ -197,7 +192,7 @@ public class UserController {
     public Result login(@Validated(ValidationGroups.LoginGroup.class) @RequestBody User o,
             HttpSession session, HttpServletResponse response) {
         String capture = (String) session.getAttribute(captureName);
-        log.error("login session capture is "+capture);
+        log.error("login session capture is " + capture);
         if (!StringUtils.equals(capture, o.getCapture())) {
             List<ErrorType2> errs = new ArrayList<ErrorType2>();
             errs.add(new ErrorType2("capture", "验证码错误"));
@@ -213,7 +208,7 @@ public class UserController {
             // return new Result(0, null, "登录成功,id=" + u.getId());
 
             // 保存登录信息到jwt，二选一即可
-            String newToken = JWTUtils.createToken(u.getId()+"");
+            String newToken = JWTUtils.createToken(u.getId() + "");
             // response.setHeader(JWTUtils.USER_LOGIN_TOKEN, newToken);
             JWTUtils.saveToken2Cookie(response, newToken);
             // return new Result(0, null, tokenMap);
@@ -225,9 +220,9 @@ public class UserController {
 
     // @PostMapping("loginJWT")
     // public void loginJWT(User o, HttpServletResponse response) {
-    //     log.warn("login user" + o);
-    //     o.setName("a").setId(1);
-    //     saveLoginStateWithJWT(response, o);
+    // log.warn("login user" + o);
+    // o.setName("a").setId(1);
+    // saveLoginStateWithJWT(response, o);
     // }
 
     private void saveLoginStateWithSession(HttpSession session, User u) {

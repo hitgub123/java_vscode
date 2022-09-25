@@ -1,8 +1,8 @@
 <template>
   <el-dialog v-model="dialogVisible" title="Shipping address">
     <el-breadcrumb class="inner">
-      <el-breadcrumb-item :to="{ path: '/demo' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/demo/goods' }"
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/goods' }"
         >商品管理</el-breadcrumb-item
       >
       <el-breadcrumb-item>商品添加或修改</el-breadcrumb-item>
@@ -161,7 +161,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style  lang='less' scoped>
 .inner {
   padding: 15px;
   margin: 15px;

@@ -1,7 +1,7 @@
 <template>
   <el-dropdown @command="selectLang">
     <el-button type="primary">
-      VUE国际化<el-icon class="el-icon--right"><arrow-down /></el-icon>
+      VUE国际化<el-icon class="el-icon--right"></el-icon>
     </el-button>
     <template #dropdown>
       <el-dropdown-menu>
@@ -12,7 +12,7 @@
   </el-dropdown>
   <el-dropdown @command="selectLang2">
     <el-button type="primary">
-      ELEMENTPLUS国际化<el-icon class="el-icon--right"><arrow-down /></el-icon>
+      ELEMENTPLUS国际化<el-icon class="el-icon--right"></el-icon>
     </el-button>
     <template #dropdown>
       <el-dropdown-menu>

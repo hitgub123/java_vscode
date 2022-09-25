@@ -198,4 +198,14 @@
             服务器把token给后端，后端解密，核对是否与header+Payload匹配。
             所以token不用保存在服务器端。保存在客户端，不管服务器重启也不失效(只要token没过期且密钥不变)
 
-    vuecli+elementui 
+        使用vuecli后新增：
+            跨域访问失败，加上slq\me\module1\config\CorsConfig.java即可
+
+            session和cookie都无法使用，jwt的token通过json返回，前端保存到localstorage，
+            再用axios读取token加入请求头，发送ajax请求
+
+            请求验证码时会携带time参数，用它生成验证码，提交表单时再次携带同一个time参数，用来校验验证码
+
+
+
+

@@ -28,8 +28,8 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     private boolean preHandleInnerWithJWT(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        String token=null;
-        String sub=null;
+        String token = null;
+        String sub = null;
         // http的header中获得token
         // token = request.getHeader(JWTUtils.USER_LOGIN_TOKEN);
         // 前端使用location.href跳转，不知道怎么设置header，改用cookie保存token
@@ -48,10 +48,10 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
         // 验证token
-        try{
+        try {
             sub = JWTUtils.validateToken(token);
-            log.error("validateToken sub="+ sub);
-        } catch (TokenExpiredException  e) {
+            log.error("validateToken sub=" + sub);
+        } catch (TokenExpiredException e) {
             log.error("token expired,redirect to login page");
             response.sendRedirect(request.getContextPath() + "/login.html");
             return false;

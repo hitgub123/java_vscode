@@ -15,10 +15,10 @@ import slq.me.module1.mapper.UserMapper;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Autowired
     UserMapper userMapper;
-    
+
     @Override
     public List<User> all(QueryWrapper<User> wrapper) {
         return userMapper.selectList(wrapper);
@@ -45,10 +45,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public IPage<User> page(int cur,int size,QueryWrapper<User> wrapper) {
+    public IPage<User> page(int cur, int size, QueryWrapper<User> wrapper) {
         Page<User> page = new Page<User>(cur, size); // 第几页，每页显示几条
-        System.out.println("page"+ cur+":"+size);
-        return userMapper.selectPage(page,wrapper);
+        System.out.println("page" + cur + ":" + size);
+        return userMapper.selectPage(page, wrapper);
     }
 
     @Override
@@ -62,6 +62,6 @@ public class UserServiceImpl implements UserService{
             return o.getId();
         } else {
             return -1;
-        }    
+        }
     }
 }

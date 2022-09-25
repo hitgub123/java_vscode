@@ -1,12 +1,15 @@
 package slq.me.module1.util;
 
-import lombok.Data;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 import java.util.Random;
 
 import org.springframework.stereotype.Service;
+
+import lombok.Data;
 
 @Data
 @Service

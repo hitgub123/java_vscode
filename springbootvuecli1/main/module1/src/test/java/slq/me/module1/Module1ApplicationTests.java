@@ -1,24 +1,17 @@
 package slq.me.module1;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import slq.me.module1.entity.User;
 import slq.me.module1.mapper.UserMapper;
 import slq.me.module1.service.UserService;
-import slq.me.module1.util.ImageVerify;
 import slq.me.module1.util.JWTUtils;
-import slq.me.module1.util.ImageVerify.ImageCode;
 
 @SpringBootTest
 class Module1ApplicationTests {
@@ -80,9 +73,8 @@ class Module1ApplicationTests {
 	@Test
 	public void testJWT() {
 		String s = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4NyIsImV4cCI6MTY2NDAxMzY4OX0.mTjpbE5y6FBjrdf_pw5Uk5l-exvjIEMXGbASGPmvslUgP53ywBgrC-yQu1g2UCXO1Hy9iTWK_-FOdBRtKLX0UW";
-		String x=JWTUtils.validateToken(s);
-
-		System.out.println(x);
+		// String x=JWTUtils.validateToken(s);
+		// System.out.println(x);
 	}
 
 }

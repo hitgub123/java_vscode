@@ -1,0 +1,33 @@
+/*  test @import url */
+/* @import url('https://at.alicdn.com/t/font_115436_7xj92q6ig8s.css'); */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+img {
+    vertical-align: middle;
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 22px;
+    background: #ddd;
+}
+
+.icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+}

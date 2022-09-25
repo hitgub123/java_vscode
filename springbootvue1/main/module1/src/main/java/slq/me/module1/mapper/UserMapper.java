@@ -1,13 +1,14 @@
 package slq.me.module1.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import slq.me.module1.entity.User;
-import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
 
+import slq.me.module1.entity.User;
 
 @Mapper
 public interface UserMapper extends BaseMapper<User> {

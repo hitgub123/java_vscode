@@ -13,7 +13,7 @@
   </head>
   <body>
     <div id="app">
-      <form action='/u/loginJWT' method='post' ref='form1'>
+      <form action="/u/loginJWT" method="post" ref="form1">
         用户名<input v-model="user.name" name="name" />
         <span class="error" v-if="errors.nameErr">{{errors.nameErr}}</span
         ><br />
@@ -22,7 +22,7 @@
         ><br />
         验证码<input v-model="user.capture" name="capture" />
         <span class="error" v-if="errors.captureErr">{{errors.captureErr}}</span
-        ><img :src='captureSrc' @click='getCapture'/><br />
+        ><img :src="captureSrc" @click="getCapture" /><br />
       </form>
       <button type="button" @click="submit">submit</button>
       <!--<button type="button" @click="submitJWT">submitJWT</button><br />-->
@@ -39,18 +39,18 @@
     data() {
       return {
         user: {},
-        captureSrc:"",
-        errors : {
+        captureSrc: "",
+        errors: {
           nameErr: "",
           passErr: "",
           captureErr: "",
-        }
+        },
       };
     },
     methods: {
       //submitJWT(){
       // console.log(this.user)
-      //  this.$refs.form1.submit()  
+      //  this.$refs.form1.submit()
       //},
       submit() {
         console.log(this.user);
@@ -58,8 +58,8 @@
           nameErr: "",
           passErr: "",
           captureErr: "",
-        }
-        this_ = this
+        };
+        this_ = this;
         axios
           .post("/u/login", {
             name: this_.user.name,
@@ -67,7 +67,10 @@
             capture: this_.user.capture,
           })
           .then(function (res) {
-            console.log("res.data.data['USER_LOGIN_TOKEN']", res.data["data"]['USER_LOGIN_TOKEN']);
+            console.log(
+              "res.data.data['USER_LOGIN_TOKEN']",
+              res.data["data"]["USER_LOGIN_TOKEN"]
+            );
             if (res.data.code == 0) {
               //window.localStorage.setItem("USER_LOGIN_TOKEN",res.data["data"]['USER_LOGIN_TOKEN'])
               //document.cookie ="USER_LOGIN_TOKEN="+res.data["data"]['USER_LOGIN_TOKEN']
@@ -83,13 +86,13 @@
           console.log(res.data.data);
         });
       },
-      getCapture(){
-        this.captureSrc='/u/capture?time='+Date.now()
-      }
+      getCapture() {
+        this.captureSrc = "/u/capture?time=" + Date.now();
+      },
     },
-    created(){
-      this.getCapture()
+    created() {
+      this.getCapture();
       //alert(window.localStorage.getItem("www"))
-    }
+    },
   });
 </script>

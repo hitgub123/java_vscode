@@ -85,7 +85,7 @@
           axios.post("/u/insert", params, config).then(function (res) {
             console.log("res.data.data", res.data["data"]);
             if (res.data.code == 0) {
-              location.href = "/users.html"
+              location.href = "/users.html";
             } else if (res.data.code == 2) {
               writeErrors(res.data.data, this_.errors);
 

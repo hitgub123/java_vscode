@@ -32,13 +32,13 @@ export default {
       this.$emit("changCollapseFlg1");
     },
     logout() {
-      this.$router.push('/');
+      this.$router.push("/");
     },
   },
 };
 </script>
 
-<style scoped>
+<style lang='less' scoped>
 .header {
   background: skyblue;
   height: 60px;

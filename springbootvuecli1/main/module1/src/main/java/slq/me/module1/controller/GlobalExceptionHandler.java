@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     public Result otherExceptionHandler(Exception e) {
         log.error(e.getMessage());
         // return new Result(1, e.getMessage(), null);
-        return new Result(1, "otherException", e);
+        return new Result(1, null,"otherException", e);
     }
 
     @ExceptionHandler(BindException.class)
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         for (ObjectError error : e.getAllErrors()) {
             log.error(error.getObjectName() + ">>>" + error.getDefaultMessage());
         }
-        return new Result(2, "BindException", e.getAllErrors());
+        return new Result(2, null,"BindException", e.getAllErrors());
     }
 
     @ResponseBody
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
         for (ObjectError error : e.getAllErrors()) {
             log.error(error.getObjectName() + ">>>" + error.getDefaultMessage());
         }
-        return new Result(2, "MethodArgumentNotValidException", e.getAllErrors());
+        return new Result(2, null,"MethodArgumentNotValidException", e.getAllErrors());
     }
 
     @ResponseBody
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     public Result ConstraintViolationExceptionHandler(ConstraintViolationException e) {
         log.error(e.getMessage());
         // return new Result(1, e.getMessage(), null);
-        return new Result(1, "ConstraintViolationException", e);
+        return new Result(1, null, "ConstraintViolationException", e);
     }
 
 }

@@ -34,10 +34,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .layout {
-  .menuC,
-  .menudemoC {
+  .menuC,.menudemoC {
     min-height: 500px;
     background: #666;
     position: fixed;

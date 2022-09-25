@@ -20,7 +20,7 @@ import goodsAddOrUpdateC from '../components/level2/goods/goodsAddOrUpdate.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/demo',
+    path: '/',
     component: layoutC,
     children: [
       {
@@ -48,7 +48,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'orders',
         name: 'orders',
         component: ordersC,
-        redirect: '/demo/orders/orderlist',
+        redirect: '/orders/orderlist',
         children: [
           {
             path: 'orderlist',
@@ -73,7 +73,7 @@ const routes: Array<RouteRecordRaw> = [
         component: diyC,
         children: [
           {
-            // path: '/demo/diy/diymanga',
+            // path: '/diy/diymanga',
             path: 'diymanga',
             name: 'diymanga',
             component: diymangaC,
@@ -98,21 +98,21 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
-// router.beforeEach((to, from, next) => {
-//   const count = sessionStorage.getItem('count') || '0'
-//   sessionStorage.setItem('count', 1 + parseInt(count) + '')
-//   const count2 = localStorage.getItem('count') || '0'
-//   localStorage.setItem('count', 2 + parseInt(count2) + '')
+// / router.beforeEach((to, from, next) => {
+// /   const count = sessionStorage.getItem('count') || '0'
+// /   sessionStorage.setItem('count', 1 + parseInt(count) + '')
+// /   const count2 = localStorage.getItem('count') || '0'
+// /   localStorage.setItem('count', 2 + parseInt(count2) + '')
 
-//   console.log('to', to.matched)
-//   console.log('sessionStorage', sessionStorage.getItem('count'))
-//   console.log('localStorage', localStorage.getItem('count'))
+// /   console.log('to', to.matched)
+// /   console.log('sessionStorage', sessionStorage.getItem('count'))
+// /   console.log('localStorage', localStorage.getItem('count'))
 
-//   if (to.matched.length == 0) {
-//     console.log(1)
-//     next()
-//     return
-//   }
+// /   if (to.matched.length == 0) {
+// /     console.log(1)
+// /     next()
+// /     return
+// /   }
 
-// })
+// / })
 export default router

@@ -1,8 +1,8 @@
 <template>
   <div>
-    ({{ $t("message.hello") }} {{ $t("message.test") }})<h1>商品管理</h1>{{
-      dialogFormVisible
-    }}{{ vCount }}
+    ({{ $t("message.hello") }} {{ $t("message.test") }})
+    <h1>商品管理</h1>
+    {{ dialogFormVisible }}{{ vCount }}
   </div>
   <div class="header">
     <el-input v-model="input" @change="search1" placeholder="Please input" />
@@ -33,15 +33,15 @@
       <el-table-column
         prop="name"
         sortable
-        label="名字"
+        label="用户名"
         show-overflow-tooltip
       />
-      <el-table-column prop="price" label="价格" />
-      <el-table-column prop="count" label="数量" />
-      <el-table-column prop="category" label="类别" />
-      <el-table-column prop="pic" label="图片" />
-      <el-table-column prop="sellpoint" label="卖点" />
-      <el-table-column prop="description" label="描述" />
+      <el-table-column prop="pass" label="密码" />
+      <el-table-column prop="age" label="年龄" />
+      <el-table-column prop="sex" label="性别" />
+      <el-table-column prop="hobbys" label="爱好" />
+      <el-table-column prop="pic1" label="图片1" />
+      <el-table-column prop="pic2" label="图片2" />
       <el-table-column
         #default="scopexx"
         fixed="right"
@@ -100,11 +100,20 @@ export default {
       if (searchParam.page) {
         this.currentPage = searchParam.page;
       }
-      this.$api.goodsList(searchParam).then((res) => {
-        if (res.status == 200) {
-          this.tableData = res.data.data;
-          this.total = res.data.total;
-          this.pageSize = res.data.pageSize;
+      // console.log(page, keyword,window.localStorage.getItem("USER_LOGIN_TOKEN"));
+      this.$axios({
+        headers: {
+          USER_LOGIN_TOKEN: window.localStorage.getItem("USER_LOGIN_TOKEN"),
+        },
+        method: "get",
+        url: "http://localhost:8080/u/page",
+        data: searchParam,
+      }).then((res) => {
+        console.log(res.data.data.records);
+        if (res.data.code == 0) {
+          this.tableData = res.data.data.records;
+          this.total = res.data.data.total;
+          this.pageSize = res.data.data.size;
         }
       });
     },
@@ -116,28 +125,46 @@ export default {
       this.$refs.dialog2.show2 = flg;
     },
     update(index, row) {
-      console.log(index);
-      console.log(row);
       this.setDialogFormVisible2(true);
-      this.$api.selectOneGood({ id: row.id }).then((res) => {
-        const data = res.data.data[0];
-        data.checkList = [];
-        data.checkedIds = [1, 8, 6];
+      this.$axios({
+        headers: {
+          USER_LOGIN_TOKEN: window.localStorage.getItem("USER_LOGIN_TOKEN"),
+        },
+        method: "get",
+        url: "http://localhost:8080/u/oneByid?id=" + row.id,
+        // data: {id:row.id},   //传不过去
+      }).then((res) => {
+        const data = res.data.data
+        console.log(data)
+        // data.checkList = [];
+        // data.checkedIds = [1, 8, 6];
         this.$refs.dialog2.goodsForm = data;
       });
     },
+
     del(index, row) {
-      console.log("index", index);
       this.$confirm({
-        title: "确认删除吗？",
+        title: "确认删除吗？id=" + row.id,
         okText: "是",
         cancelText: "否",
         icon: "exclamation-circle",
       })
         .then(() => {
-          this.$api.delGood({ id: row.id }).then((res) => {
-            this.$message({ message: "删除成功", type: "info" });
-            this.search1();
+          this.$axios({
+            headers: {
+              USER_LOGIN_TOKEN: window.localStorage.getItem("USER_LOGIN_TOKEN"),
+            },
+            method: "get",
+            url: "http://localhost:8080/u/delete?id=" + row.id,
+            // data: {id:row.id},   //传不过去
+          }).then((res) => {
+            if (res.data.code == 0) {
+              this.$message({ message: "删除成功", type: "info" });
+              this.search1();
+            } else {
+              this.$message({ message: "删除失败", type: "error" });
+              this.search1();
+            }
           });
         })
         .catch(() => {
@@ -151,7 +178,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .header {
   display: flex;
   padding: 15px;
