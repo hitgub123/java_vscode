@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--两种方法都可以引用css文件
+      <link href="/css/slq.css" rel="stylesheet" type="text/css"/>-->
+    <style type="text/css">
+      @import "/css/slq.css";
+    </style>
+    <title>登录页面</title>
+  </head>
+  <body>
+    <div id="app">
+      <form action='/u/loginJWT' method='post' ref='form1'>
+        用户名<input v-model="user.name" name="name" />
+        <span class="error" v-if="errors.nameErr">{{errors.nameErr}}</span
+        ><br />
+        密码<input v-model="user.pass" name="pass" />
+        <span class="error" v-if="errors.passErr">{{errors.passErr}}</span
+        ><br />
+        验证码<input v-model="user.capture" name="capture" />
+        <span class="error" v-if="errors.captureErr">{{errors.captureErr}}</span
+        ><img :src='captureSrc' @click='getCapture'/><br />
+      </form>
+      <button type="button" @click="submit">submit</button>
+      <!--<button type="button" @click="submitJWT">submitJWT</button><br />-->
+      <button type="button" @click="logout">logout</button><br />
+    </div>
+  </body>
+</html>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script src="/js/slq.js"></script>
+<script>
+  const app = new Vue({
+    el: "#app",
+    data() {
+      return {
+        user: {},
+        captureSrc:"",
+        errors : {
+          nameErr: "",
+          passErr: "",
+          captureErr: "",
+        }
+      };
+    },
+    methods: {
+      //submitJWT(){
+      // console.log(this.user)
+      //  this.$refs.form1.submit()  
+      //},
+      submit() {
+        console.log(this.user);
+        this.errors = {
+          nameErr: "",
+          passErr: "",
+          captureErr: "",
+        }
+        this_ = this
+        axios
+          .post("/u/login", {
+            name: this_.user.name,
+            pass: this_.user.pass,
+            capture: this_.user.capture,
+          })
+          .then(function (res) {
+            console.log("res.data.data['USER_LOGIN_TOKEN']", res.data["data"]['USER_LOGIN_TOKEN']);
+            if (res.data.code == 0) {
+              //window.localStorage.setItem("USER_LOGIN_TOKEN",res.data["data"]['USER_LOGIN_TOKEN'])
+              //document.cookie ="USER_LOGIN_TOKEN="+res.data["data"]['USER_LOGIN_TOKEN']
+              //console.log(document.cookie )
+              //location.href = "/users.html";
+            } else if (res.data.code == 2) {
+              writeErrors(res.data.data, this_.errors);
+            }
+          });
+      },
+      logout() {
+        axios.get("/u/logout").then(function (res) {
+          console.log(res.data.data);
+        });
+      },
+      getCapture(){
+        this.captureSrc='/u/capture?time='+Date.now()
+      }
+    },
+    created(){
+      this.getCapture()
+      //alert(window.localStorage.getItem("www"))
+    }
+  });
+</script>
